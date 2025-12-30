@@ -1,6 +1,6 @@
-import mongoose, { type Model } from "mongoose";
+import { model, models, type Model } from "mongoose";
 import { userSchema, type UserDocument } from "./schema";
 
 export const UserModel: Model<UserDocument> =
-  (mongoose.models.User as Model<UserDocument>) ||
-  mongoose.model<UserDocument>("User", userSchema);
+  (models.User as Model<UserDocument>) ||
+  model<UserDocument>("User", userSchema);

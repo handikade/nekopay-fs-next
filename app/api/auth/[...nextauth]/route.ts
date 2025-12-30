@@ -41,8 +41,7 @@ export const authOptions: AuthOptions = {
             email: user.email,
             roles: user.roles,
           };
-        } catch (error) {
-          console.log("Error: ", error);
+        } catch {
           return null;
         }
       },
@@ -51,6 +50,26 @@ export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt" as SessionStrategy,
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      // When the user signs in, the `user` object from the `authorize` function is passed here.
+      // We are adding the user's `id` and `roles` to the token.
+      if (user) {
+        token.id = user.id;
+        token.roles = user.roles;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // The `session` callback receives the `token` from the `jwt` callback.
+      // We are adding the `id` and `roles` from the token to the `session.user` object.
+      if (session.user) {
+        session.user.id = token.id;
+        session.user.roles = token.roles;
+      }
+      return session;
+    },
   },
   pages: {
     signIn: "/",
