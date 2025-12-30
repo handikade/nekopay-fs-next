@@ -2,19 +2,22 @@ import { connectMongo } from "@/lib/mongoose";
 import { ServiceError } from "@/lib/service-error";
 import bcrypt from "bcryptjs";
 import { ZodError, z } from "zod";
-import { RegisterUserSchema } from "./user-dto";
-import * as userRepo from "./user-repository";
+import { RegisterUserSchema } from "./dto";
+import * as userRepo from "./repository";
 
 export async function findByEmail(email: string) {
   return await userRepo.findByEmail(email);
 }
 
-export async function register(payload: { email: string; password:string }) {
+export async function register(payload: { email: string; password: string }) {
   try {
     RegisterUserSchema.parse(payload);
   } catch (error) {
     if (error instanceof ZodError) {
-      throw new ServiceError(400, error.issues.map((e: z.ZodIssue) => e.message).join(", "));
+      throw new ServiceError(
+        400,
+        error.issues.map((e: z.ZodIssue) => e.message).join(", ")
+      );
     }
     throw error;
   }

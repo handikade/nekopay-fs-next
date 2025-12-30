@@ -1,5 +1,5 @@
 import { connectMongo } from "@/lib/mongoose";
-import * as userService from "@/modules/user/user-service";
+import * as userService from "@/modules/user/service";
 import bcrypt from "bcryptjs";
 import { type AuthOptions, type SessionStrategy } from "next-auth";
 import NextAuth from "next-auth/next";

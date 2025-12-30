@@ -1,5 +1,5 @@
-import { UserModel } from "./user-model";
-import { User, UserDocument } from "./user-schema";
+import { UserModel } from "./model";
+import { User, UserDocument } from "./schema";
 
 export async function create(
   payload: Omit<User, "_id">
