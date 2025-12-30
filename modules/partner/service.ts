@@ -1,12 +1,7 @@
 import { ServiceError } from "@/lib/service-error";
 import { type Session } from "next-auth";
 import { z, ZodError } from "zod";
-import {
-  createPartnerDto,
-  CreatePartnerDto,
-  updatePartnerDto,
-  UpdatePartnerDto,
-} from "./dto";
+import { createPartnerDto, CreatePartnerDto, updatePartnerDto } from "./dto";
 import * as partnerRepository from "./repository";
 
 // Define the shape of the repository dependency for the factory
@@ -36,7 +31,10 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
       const userEmail = session?.user?.email;
 
       if (!userId || !userEmail) {
-        throw new ServiceError(401, "You must be logged in to create a partner.");
+        throw new ServiceError(
+          401,
+          "You must be logged in to create a partner."
+        );
       }
 
       try {
@@ -62,7 +60,11 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
       } catch (error) {
         if (error instanceof ZodError) {
           // Re-throw Zod validation errors as a structured ServiceError
-          throw new ServiceError(400, "Invalid input data", z.treeifyError(error));
+          throw new ServiceError(
+            400,
+            "Invalid input data",
+            z.treeifyError(error)
+          );
         }
         // Re-throw other errors
         throw error;
@@ -80,7 +82,10 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
     async update(id: string, payload: unknown, session: Session | null) {
       // 1. Ensure user is authenticated
       if (!session?.user) {
-        throw new ServiceError(401, "You must be logged in to update a partner.");
+        throw new ServiceError(
+          401,
+          "You must be logged in to update a partner."
+        );
       }
 
       try {
@@ -97,7 +102,11 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
         return updatedPartner;
       } catch (error) {
         if (error instanceof ZodError) {
-          throw new ServiceError(400, "Invalid input data", z.treeifyError(error));
+          throw new ServiceError(
+            400,
+            "Invalid input data",
+            z.treeifyError(error)
+          );
         }
         // Re-throw other errors, including the 404 from above
         throw error;
