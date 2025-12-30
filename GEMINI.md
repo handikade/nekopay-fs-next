@@ -6,44 +6,17 @@ This document provides guidance for interacting with the Gemini AI assistant in 
 
 Don't change any code unless I explicitly tell you to do so.
 
-## Project Overview
+## Project Architecture
 
-(Briefly describe the project's purpose and what it does. For example: "nekopay-fs-next is a Next.js application for managing financial transactions.")
+The project follows a layered architecture, specifically a **Service-Repository Pattern**, for its modules. When creating new modules, please adhere to this pattern.
 
-## Getting Started
+The layers are organized as follows within a module (e.g., `modules/user`):
 
-(Provide the steps to set up the development environment and run the project locally.)
+1.  **`schema.ts`**: Defines the Mongoose schema for the data model. This is the source of truth for the data structure and database-level validation.
+2.  **`model.ts`**: Creates the Mongoose model from the schema. This is the main interface for database collection interaction.
+3.  **`dto.ts`** (Data Transfer Object): Defines data shapes for API inputs using `zod` for validation. This ensures data integrity at the application's entry points.
+4.  **`repository.ts`**: The data access layer. It abstracts all database operations (e.g., `create`, `findByEmail`) and interacts directly with the Mongoose model. This keeps database logic isolated.
+5.  **`service.ts`**: The business logic layer. It orchestrates application functionality by calling methods on the repository. It should not interact directly with the database model.
+6.  **API Route** (e.g., `app/api/user/.../route.ts`): The controller layer. It handles HTTP requests, calls the appropriate service methods, and returns the response.
 
-1.  Install dependencies: `pnpm install`
-2.  Run the development server: `pnpm dev`
-
-## Project Structure
-
-(Provide a brief overview of the key directories and files in the project.)
-
-- `app/`: Contains the Next.js pages and API routes.
-- `lib/`: Contains shared library code, such as database connections and error handling.
-- `modules/`: Contains the business logic for different modules of the application (e.g., auth, user, partners).
-- `public/`: Contains static assets.
-
-## Development Workflow
-
-(Describe the typical development workflow, including how to run tests, linting, and other quality checks.)
-
-- **Running tests:** (Provide the command to run tests, e.g., `pnpm test`)
-- **Linting:** `pnpm lint`
-- **Type checking:** `pnpm tsc`
-
-## Interaction Guide
-
-(Provide any specific instructions or preferences for interacting with Gemini.)
-
-- **Be specific in your requests.** Instead of "fix the bug," try "The login form is not submitting correctly. The error seems to be in the `app/api/auth/login/route.ts` file."
-- **Provide context.** If you're working on a specific file, mention it in your request.
-- **Specify conventions.** If your project has specific coding conventions, mention them here.
-
-## Important Commands
-
-(List any other important commands that are used in the project.)
-
-- `pnpm build`: Creates a production build of the application.
+By keeping these concerns separate, the codebase remains clean, testable, and maintainable.
