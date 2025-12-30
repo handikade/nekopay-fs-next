@@ -1,0 +1,46 @@
+import { NextRequest, NextResponse } from "next/server";
+import { decrypt } from "./lib/jwt";
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Allow requests to auth routes and public files
+  if (
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/_next/") ||
+    pathname.startsWith("/favicon.ico")
+  ) {
+    return NextResponse.next();
+  }
+
+  const sessionCookie = request.cookies.get("session");
+  if (!sessionCookie) {
+    if (pathname.startsWith("/api/")) {
+      return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    return NextResponse.next();
+  }
+
+  try {
+    const session = await decrypt(sessionCookie.value);
+    if (new Date() > new Date(session.expires)) {
+      throw new Error("Session expired");
+    }
+  } catch {
+    if (pathname.startsWith("/api/")) {
+      return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ["/api/:path*", "/dashboard/:path*"], // protect api routes and a potential dashboard
+};
