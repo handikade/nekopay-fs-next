@@ -1,6 +1,6 @@
 import mongoose, { type Model } from "mongoose";
-import { userSchema, type UserDocShape } from "./user-schema";
+import { userSchema, type UserDocument } from "./user-schema";
 
-export const UserModel: Model<UserDocShape> =
-  (mongoose.models.User as Model<UserDocShape>) ||
-  mongoose.model<UserDocShape>("User", userSchema);
+export const UserModel: Model<UserDocument> =
+  (mongoose.models.User as Model<UserDocument>) ||
+  mongoose.model<UserDocument>("User", userSchema);

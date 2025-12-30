@@ -61,3 +61,8 @@ export const userListSchema = userWriteBaseSchema.omit({
   address: true,
 });
 export type UserList = z.infer<typeof userListSchema>;
+
+export const adminCreateUserSchema = z.object({
+  email: z.email(),
+});
+export type AdminCreateUser = z.infer<typeof adminCreateUserSchema>;

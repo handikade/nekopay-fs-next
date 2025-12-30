@@ -13,7 +13,7 @@ export async function register(payload: { email: string; password: string }) {
     roles: ["user"],
   });
 
-  return { id: createdUser._id };
+  return { id: createdUser._id.toString() };
 }
 
 export async function login(payload: { email: string; password: string }) {

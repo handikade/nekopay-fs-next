@@ -1,4 +1,8 @@
-import { Schema, type InferSchemaType, type Types } from "mongoose";
+import {
+  Schema,
+  type InferSchemaType,
+  type HydratedDocument,
+} from "mongoose";
 
 const userAddressSchema = new Schema(
   {
@@ -9,7 +13,7 @@ const userAddressSchema = new Schema(
     zip: { type: String },
     country: { type: String },
   },
-  { _id: false }
+  { _id: false },
 );
 
 export const userSchema = new Schema({
@@ -34,6 +38,6 @@ export const userSchema = new Schema({
 
 userSchema.index({ email: 1 }, { unique: true });
 
-export type UserDocShape = InferSchemaType<typeof userSchema> & {
-  _id: Types.ObjectId;
-};
+export type User = InferSchemaType<typeof userSchema>;
+
+export type UserDocument = HydratedDocument<User>;
