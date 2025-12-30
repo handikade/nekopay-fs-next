@@ -16,7 +16,7 @@ export async function register(payload: { email: string; password: string }) {
     if (error instanceof ZodError) {
       throw new ServiceError(
         400,
-        error.issues.map((e: z.ZodIssue) => e.message).join(", ")
+        error.issues.map((e: z.core.$ZodIssue) => e.message).join(", ")
       );
     }
     throw error;
