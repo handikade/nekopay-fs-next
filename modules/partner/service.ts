@@ -159,7 +159,7 @@ export function adaptFindPartnersQueryDtoToSearchQuery(
   return {
     page: query.page ?? 1,
     limit: query.limit ?? 10,
-    sortBy: query.sortBy ?? "created_at", // Default to 'name' if not provided
+    sortBy: query.sortBy ?? "created_at",
     sortOrder: query.sortOrder ?? "desc",
     ...(query.email && { email: query.email }),
     ...(query.partner_number && { partner_number: query.partner_number }),

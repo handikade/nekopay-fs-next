@@ -44,7 +44,6 @@ export async function findAll(query: SearchQuery): Promise<{
   partners: PartnerDocument[];
   total: number;
 }> {
-  console.log(query);
   const { email, limit, page, partner_number, sortBy, sortOrder } = query;
 
   const filters: QueryFilter<PartnerDocument> = {};
