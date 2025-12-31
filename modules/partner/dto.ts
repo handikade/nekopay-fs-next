@@ -64,3 +64,14 @@ export const detailPartnerDto = partnerBase.extend({
   updated_at: z.date().optional(),
 });
 export type DetailPartnerDto = z.infer<typeof detailPartnerDto>;
+
+// Schema for the query parameters for finding partners
+export const findPartnersQueryDto = z.object({
+  page: z.coerce.number().int().min(1).default(1).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(10).optional(),
+  sortBy: z.string().optional(),
+  sortOrder: z.enum(["asc", "desc"]).default("asc").optional(),
+  email: z.string().optional(),
+  partner_number: z.string().optional(),
+});
+export type FindPartnersQueryDto = z.infer<typeof findPartnersQueryDto>;

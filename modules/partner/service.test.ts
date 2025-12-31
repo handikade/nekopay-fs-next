@@ -6,6 +6,7 @@ import { PartnerServiceFactory } from "./service";
 const mockRepo = {
   create: jest.fn(),
   update: jest.fn(),
+  findAll: jest.fn(),
 };
 
 // Create a service instance with the mock repository

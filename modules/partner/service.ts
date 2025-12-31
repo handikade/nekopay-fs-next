@@ -1,13 +1,21 @@
 import { ServiceError } from "@/lib/service-error";
 import { type Session } from "next-auth";
 import { z, ZodError } from "zod";
-import { createPartnerDto, CreatePartnerDto, updatePartnerDto } from "./dto";
+import {
+  createPartnerDto,
+  CreatePartnerDto,
+  findPartnersQueryDto,
+  FindPartnersQueryDto,
+  updatePartnerDto,
+} from "./dto";
+import type { SearchQuery } from "./repository";
 import * as partnerRepository from "./repository";
 
 // Define the shape of the repository dependency for the factory
 type PartnerRepository = {
   create: typeof partnerRepository.create;
   update: typeof partnerRepository.update;
+  findAll: typeof partnerRepository.findAll;
 };
 
 /**
@@ -112,9 +120,51 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
         throw error;
       }
     },
+
+    /**
+     * Retrieves a list of partners based on the query parameters.
+     * @param query - The query parameters.
+     * @param session - The user session object.
+     * @returns An object containing the list of partners and the total count of records.
+     * @throws {ServiceError} If the user is not authenticated, payload is invalid, or partner is not found.
+     */
+    async findAll(query: unknown, session: Session | null) {
+      if (!session?.user) {
+        throw new ServiceError(401, "You must be logged in to view partners.");
+      }
+
+      try {
+        const parsedQuery = findPartnersQueryDto.parse(query);
+        const searchQuery = adaptFindPartnersQueryDtoToSearchQuery(parsedQuery);
+        const { partners, total } = await repo.findAll(searchQuery);
+        return { partners, total_records: total };
+      } catch (error) {
+        if (error instanceof ZodError) {
+          throw new ServiceError(
+            400,
+            "Invalid input data",
+            z.treeifyError(error)
+          );
+        }
+
+        throw error;
+      }
+    },
   };
 }
 
-// Create and export a default instance of the service for application use.
+export function adaptFindPartnersQueryDtoToSearchQuery(
+  query: FindPartnersQueryDto
+): SearchQuery {
+  return {
+    page: query.page ?? 1,
+    limit: query.limit ?? 10,
+    sortBy: query.sortBy ?? "created_at", // Default to 'name' if not provided
+    sortOrder: query.sortOrder ?? "desc",
+    ...(query.email && { email: query.email }),
+    ...(query.partner_number && { partner_number: query.partner_number }),
+  };
+}
+
 const partnerService = PartnerServiceFactory(partnerRepository);
 export default partnerService;
