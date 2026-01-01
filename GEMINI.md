@@ -21,6 +21,12 @@ The layers are organized as follows within a module (e.g., `modules/user`):
 
 By keeping these concerns separate, the codebase remains clean, testable, and maintainable.
 
+### Data Access Strategy
+
+- **Internal Pages (Server Components)**: For pages rendered within the Next.js application, prefer using **Server Components** that call the `service` layer directly. This is more performant as it avoids an unnecessary network hop.
+
+- **External Consumers**: API Routes (e.g., `app/api/.../route.ts`) should be created to expose functionality to external clients or for client-side components that need to fetch data. These routes will call the `service` layer to execute business logic.
+
 ## Zod Best Practices
 
 When working with Zod, please adhere to the following conventions:
