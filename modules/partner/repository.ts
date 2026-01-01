@@ -4,6 +4,11 @@ import type { CreatePartnerDto, UpdatePartnerDto } from "./dto";
 import { PartnerModel } from "./model";
 import type { PartnerDocument } from "./schema";
 
+interface SchemaValidationRule {
+  missingProperties?: string[];
+  propertiesNotSatisfied?: Array<{ propertyName: string }>;
+}
+
 export type SearchQuery = {
   page: number;
   limit: number;
@@ -24,9 +29,9 @@ export async function create(
       const details = error.errInfo?.details;
       const rules = details?.schemaRulesNotSatisfied ?? [];
 
-      const missing = rules.flatMap((rule) => rule.missingProperties ?? []);
-      const invalid = rules.flatMap((rule) =>
-        (rule.propertiesNotSatisfied ?? []).map((p) => p.propertyName)
+      const missing = rules.flatMap((rule: SchemaValidationRule) => rule.missingProperties ?? []);
+      const invalid = rules.flatMap((rule: SchemaValidationRule) =>
+        (rule.propertiesNotSatisfied ?? []).map((p: { propertyName: string }) => p.propertyName)
       );
 
       console.error("Mongo validation failed", { missing, invalid, rules });
