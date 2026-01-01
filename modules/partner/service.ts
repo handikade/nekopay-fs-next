@@ -16,6 +16,8 @@ type PartnerRepository = {
   create: typeof partnerRepository.create;
   update: typeof partnerRepository.update;
   findAll: typeof partnerRepository.findAll;
+  findById: typeof partnerRepository.findById;
+  deleteById: typeof partnerRepository.deleteById;
 };
 
 /**
@@ -149,6 +151,17 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
 
         throw error;
       }
+    },
+
+    async deleteById(id: string, session: Session | null) {
+      if (!session?.user) {
+        throw new ServiceError(
+          401,
+          "You must be logged in to delete a partner."
+        );
+      }
+
+      return await repo.deleteById(id);
     },
   };
 }
