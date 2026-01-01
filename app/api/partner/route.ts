@@ -1,3 +1,4 @@
+import { successResponse } from "@/lib/api-response";
 import { connectMongo } from "@/lib/mongoose";
 import { ServiceError } from "@/lib/service-error";
 import partnerService from "@/modules/partner/service";
@@ -7,6 +8,7 @@ import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function POST(request: Request) {
   await connectMongo();
+
   try {
     const payload = await request.json();
     const session = await getServerSession(authOptions);
@@ -23,7 +25,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generic error
     console.error("An unexpected error occurred:", error);
     return NextResponse.json(
       { message: "An unexpected error occurred" },
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   await connectMongo();
+
   try {
     const session = await getServerSession(authOptions);
 
@@ -42,7 +44,8 @@ export async function GET(request: Request) {
     const query = Object.fromEntries(searchParams.entries());
 
     const result = await partnerService.findAll(query, session);
-    return NextResponse.json(result, { status: 200 });
+
+    return successResponse(result.partners, 200, result.meta);
   } catch (error) {
     if (error instanceof ServiceError) {
       return NextResponse.json(

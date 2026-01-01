@@ -42,7 +42,12 @@ export async function findById(id: string): Promise<PartnerDocument | null> {
 
 export async function findAll(query: SearchQuery): Promise<{
   partners: PartnerDocument[];
-  total: number;
+  meta: {
+    current_page: number;
+    items_per_page: number;
+    total_records: number;
+    total_pages: number;
+  };
 }> {
   const { email, limit, page, partner_number, sortBy, sortOrder } = query;
 
@@ -65,7 +70,15 @@ export async function findAll(query: SearchQuery): Promise<{
 
   const total = await PartnerModel.countDocuments(filters);
 
-  return { partners, total };
+  return {
+    partners,
+    meta: {
+      current_page: page,
+      items_per_page: limit,
+      total_records: total,
+      total_pages: Math.ceil(total / limit),
+    },
+  };
 }
 
 export async function update(

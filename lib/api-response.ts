@@ -48,6 +48,7 @@ export function successResponse<T, M extends Metadata = Metadata>(
     data,
     ...(metadata && { metadata }),
   };
+
   return NextResponse.json(body, { status });
 }
 

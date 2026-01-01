@@ -136,8 +136,8 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
       try {
         const parsedQuery = findPartnersQueryDto.parse(query);
         const searchQuery = adaptFindPartnersQueryDtoToSearchQuery(parsedQuery);
-        const { partners, total } = await repo.findAll(searchQuery);
-        return { partners, total_records: total };
+        const { partners, meta } = await repo.findAll(searchQuery);
+        return { partners, meta };
       } catch (error) {
         if (error instanceof ZodError) {
           throw new ServiceError(
