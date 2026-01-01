@@ -1,4 +1,4 @@
-import { successResponse, errorResponse } from "@/lib/api-response";
+import { errorResponse, successResponse } from "@/lib/api-response";
 import { connectMongo } from "@/lib/mongoose";
 import { ServiceError } from "@/lib/service-error";
 import partnerService from "@/modules/partner/service";
@@ -9,6 +9,8 @@ export async function GET(
   _: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  await connectMongo();
+
   try {
     const session = await getServerSession(authOptions);
     const { id } = await params;
@@ -29,6 +31,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  await connectMongo();
+
   try {
     const session = await getServerSession(authOptions);
     const payload = await request.json();
