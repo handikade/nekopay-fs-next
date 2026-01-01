@@ -7,6 +7,8 @@ const mockRepo = {
   create: jest.fn(),
   update: jest.fn(),
   findAll: jest.fn(),
+  findById: jest.fn(),
+  deleteById: jest.fn(),
 };
 
 // Create a service instance with the mock repository
