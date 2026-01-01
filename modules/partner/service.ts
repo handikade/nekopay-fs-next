@@ -99,10 +99,8 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
       }
 
       try {
-        // 2. Validate the payload
         const parsedPayload = updatePartnerDto.parse(payload);
 
-        // 3. Pass to repository
         const updatedPartner = await repo.update(id, parsedPayload);
 
         if (!updatedPartner) {
@@ -118,7 +116,7 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
             z.treeifyError(error)
           );
         }
-        // Re-throw other errors, including the 404 from above
+
         throw error;
       }
     },
@@ -153,12 +151,32 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
       }
     },
 
+    async findById(id: string, session: Session | null) {
+      if (!session?.user) {
+        throw new ServiceError(401, "You must be logged in to view a partner.");
+      }
+
+      const found = await repo.findById(id);
+
+      if (!found) {
+        throw new ServiceError(404, "Partner not found.");
+      }
+
+      return found;
+    },
+
     async deleteById(id: string, session: Session | null) {
       if (!session?.user) {
         throw new ServiceError(
           401,
           "You must be logged in to delete a partner."
         );
+      }
+
+      const found = await repo.findById(id);
+
+      if (!found) {
+        throw new ServiceError(404, "Partner not found.");
       }
 
       return await repo.deleteById(id);
