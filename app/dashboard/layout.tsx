@@ -1,5 +1,10 @@
-"use client"
+"use client";
 
+import {
+  Cog6ToothIcon,
+  HomeIcon,
+  UsersIcon,
+} from "@heroicons/react/24/outline";
 import { signOut } from "next-auth/react";
 
 export default function DashboardLayout({
@@ -15,14 +20,26 @@ export default function DashboardLayout({
           Dashboard
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <a href="/dashboard" className="block py-2 px-4 rounded hover:bg-gray-700">
-            Home
+          <a
+            href="/dashboard"
+            className="flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-700"
+          >
+            <HomeIcon className="h-5 w-5" />
+            <span>Home</span>
           </a>
-          <a href="/partners" className="block py-2 px-4 rounded hover:bg-gray-700">
-            Partners
+          <a
+            href="/dashboard/partners"
+            className="flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-700"
+          >
+            <UsersIcon className="h-5 w-5" />
+            <span>Partners</span>
           </a>
-          <a href="#" className="block py-2 px-4 rounded hover:bg-gray-700">
-            Settings
+          <a
+            href="#"
+            className="flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-700"
+          >
+            <Cog6ToothIcon className="h-5 w-5" />
+            <span>Settings</span>
           </a>
         </nav>
       </aside>
