@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Shared input fields
 const partnerInputSchema = z.object({
   user_id: z.string(),
   type: z.enum(["supplier", "buyer", "both"]),
@@ -20,12 +19,9 @@ const partnerInputSchema = z.object({
   created_by: z.string().trim(),
 });
 
-// Schema for creating a partner
 export const createPartnerDto = partnerInputSchema;
 export type CreatePartnerDto = z.infer<typeof createPartnerDto>;
 
-// Schema for updating a partner
-// All fields are optional, user_id, partner_number, created_by are not updatable
 export const updatePartnerDto = partnerInputSchema
   .partial()
   .omit({ user_id: true, partner_number: true, created_by: true })
@@ -38,17 +34,16 @@ export type UpdatePartnerDto = z.infer<typeof updatePartnerDto>;
 const partnerBase = z.object({
   id: z.string(),
   type: z.enum(["supplier", "buyer", "both"]),
-  partner_number: z.string(),
+  number: z.string(),
   name: z.string(),
   email: z.email(),
   phone: z.string(),
+  createdAt: z.string(),
 });
 
-// Schema for partner list item
 export const listPartnerDto = partnerBase;
 export type ListPartnerDto = z.infer<typeof listPartnerDto>;
 
-// Schema for partner detail
 export const detailPartnerDto = partnerBase.extend({
   business_entity: z.string().optional(),
   company_phone: z.string().optional(),
@@ -65,7 +60,6 @@ export const detailPartnerDto = partnerBase.extend({
 });
 export type DetailPartnerDto = z.infer<typeof detailPartnerDto>;
 
-// Schema for the query parameters for finding partners
 export const findPartnersQueryDto = z.object({
   page: z.coerce.number().int().min(1).default(1).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(10).optional(),

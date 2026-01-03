@@ -2,13 +2,15 @@ import { ServiceError } from "@/lib/service-error";
 import { type Session } from "next-auth";
 import { z, ZodError } from "zod";
 import {
+  adaptFindPartnersQueryDtoToSearchQuery,
+  partnerToListDto,
+} from "./adapter";
+import {
   createPartnerDto,
   CreatePartnerDto,
   findPartnersQueryDto,
-  FindPartnersQueryDto,
   updatePartnerDto,
 } from "./dto";
-import type { SearchQuery } from "./repository";
 import * as partnerRepository from "./repository";
 
 // Define the shape of the repository dependency for the factory
@@ -137,7 +139,7 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
         const parsedQuery = findPartnersQueryDto.parse(query);
         const searchQuery = adaptFindPartnersQueryDtoToSearchQuery(parsedQuery);
         const { partners, meta } = await repo.findAll(searchQuery);
-        return { partners, meta };
+        return { partners: partners.map((p) => partnerToListDto(p)), meta };
       } catch (error) {
         if (error instanceof ZodError) {
           throw new ServiceError(
@@ -181,19 +183,6 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
 
       return await repo.deleteById(id);
     },
-  };
-}
-
-export function adaptFindPartnersQueryDtoToSearchQuery(
-  query: FindPartnersQueryDto
-): SearchQuery {
-  return {
-    page: query.page ?? 1,
-    limit: query.limit ?? 10,
-    sortBy: query.sortBy ?? "created_at",
-    sortOrder: query.sortOrder ?? "desc",
-    ...(query.email && { email: query.email }),
-    ...(query.partner_number && { partner_number: query.partner_number }),
   };
 }
 
