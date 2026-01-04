@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 // #region COMPONENTS
 import PaginationControls from "@/components/PaginationControls";
 import TablePartner from "@/components/TablePartner";
+import Link from "next/link";
 // #endregion COMPONENTS
 
 type PartnersPageProps = {
@@ -37,7 +38,11 @@ const PartnersPage = async (props: PartnersPageProps) => {
   const sortBy = allowedSortBy.includes(searchParams.sortBy ?? "")
     ? (searchParams.sortBy as (typeof allowedSortBy)[number])
     : "created_at";
-  const sortOrder = searchParams.sortOrder === "desc" ? "desc" : "asc";
+  const sortOrder = searchParams.sortOrder
+    ? searchParams.sortOrder === "desc"
+      ? "desc"
+      : "asc"
+    : "desc";
 
   const { partners, meta } = await partnerService.findAll(
     { page, limit, sortBy, sortOrder },
@@ -46,10 +51,20 @@ const PartnersPage = async (props: PartnersPageProps) => {
   const { current_page, total_pages, total_records } = meta;
 
   return (
-    <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md">
-      <header className="p-6 border-b border-gray-200">
-        <h1 className="text-3xl font-bold text-gray-800">Partners</h1>
-      </header>
+    <div className="bg-white rounded-lg shadow-md">
+      <div className="flex align-middle justify-between">
+        <header className="p-6 border-b border-gray-200">
+          <h1 className="text-3xl font-bold text-gray-800">Partners</h1>
+        </header>
+        <Link
+          href="/dashboard/partners/create"
+          className="p-6 border-b border-gray-200"
+        >
+          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+            Create Partner
+          </button>
+        </Link>
+      </div>
       <div className="p-6">
         <div className="overflow-x-auto">
           <TablePartner
