@@ -1,26 +1,46 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import PaginationControls from "@/components/PaginationControls";
-import TablePartner from "@/components/TablePartner";
 import { connectMongo } from "@/lib/mongoose";
 import partnerService from "@/modules/partner/service";
 import { getServerSession } from "next-auth";
 
-interface PartnersPageProps {
+// #region COMPONENTS
+import PaginationControls from "@/components/PaginationControls";
+import TablePartner from "@/components/TablePartner";
+// #endregion COMPONENTS
+
+type PartnersPageProps = {
   searchParams: Promise<{
     page?: string;
     limit?: string;
+    sortBy?: string;
+    sortOrder?: string;
   }>;
-}
+};
 
-const PartnersPage = async ({ searchParams }: PartnersPageProps) => {
-  const resolvedSearchParams = await searchParams;
+const PartnersPage = async (props: PartnersPageProps) => {
+  const searchParams = await props.searchParams;
   const session = await getServerSession(authOptions);
+
   await connectMongo();
-  const page = parseInt(resolvedSearchParams.page ?? "1", 10);
-  const limit = parseInt(resolvedSearchParams.limit ?? "5", 10);
+
+  const page = parseInt(searchParams.page ?? "1", 10);
+  const limitOptions = [8, 20, 50, 100];
+  const requestedLimit = parseInt(searchParams.limit ?? "8", 10);
+  const limit = limitOptions.includes(requestedLimit) ? requestedLimit : 8;
+  const allowedSortBy = [
+    "partner_number",
+    "name",
+    "email",
+    "phone",
+    "created_at",
+  ];
+  const sortBy = allowedSortBy.includes(searchParams.sortBy ?? "")
+    ? (searchParams.sortBy as (typeof allowedSortBy)[number])
+    : "created_at";
+  const sortOrder = searchParams.sortOrder === "desc" ? "desc" : "asc";
 
   const { partners, meta } = await partnerService.findAll(
-    { page, limit },
+    { page, limit, sortBy, sortOrder },
     session
   );
   const { current_page, total_pages, total_records } = meta;
@@ -32,7 +52,13 @@ const PartnersPage = async ({ searchParams }: PartnersPageProps) => {
       </header>
       <div className="p-6">
         <div className="overflow-x-auto">
-          <TablePartner partners={partners} />
+          <TablePartner
+            partners={partners}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            page={page}
+            limit={limit}
+          />
         </div>
       </div>
       {meta && (
