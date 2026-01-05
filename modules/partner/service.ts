@@ -1,3 +1,4 @@
+import { buildPaginationLinks, PaginationLinks } from "@/lib/pagination";
 import { ServiceError } from "@/lib/service-error";
 import { type Session } from "next-auth";
 import { z, ZodError } from "zod";
@@ -130,7 +131,13 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
      * @returns An object containing the list of partners and the total count of records.
      * @throws {ServiceError} If the user is not authenticated, payload is invalid, or partner is not found.
      */
-    async findAll(query: unknown, session: Session | null) {
+    async findAll(
+      query: unknown,
+      session: Session | null,
+      config: { withPagination: boolean; baseUrl?: string } = {
+        withPagination: false,
+      }
+    ) {
       if (!session?.user) {
         throw new ServiceError(401, "You must be logged in to view partners.");
       }
@@ -138,8 +145,41 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
       try {
         const parsedQuery = findPartnersQueryDto.parse(query);
         const searchQuery = adaptFindPartnersQueryDtoToSearchQuery(parsedQuery);
-        const { partners, meta } = await repo.findAll(searchQuery);
-        return { partners: partners.map((p) => partnerToListDto(p)), meta };
+        const { partners, total_records } = await repo.findAll(searchQuery);
+        const meta = {
+          total_records,
+          current_page: searchQuery.page,
+          items_per_page: searchQuery.limit,
+          total_pages: Math.ceil(total_records / searchQuery.limit),
+        };
+
+        const response: {
+          partners: ReturnType<typeof partnerToListDto>[];
+          meta: typeof meta;
+          links?: PaginationLinks;
+        } = {
+          partners: partners.map((p) => partnerToListDto(p)),
+          meta,
+        };
+
+        if (config.withPagination) {
+          if (!config.baseUrl) {
+            // This is a server-side error, so we throw a standard Error
+            throw new Error("baseUrl is required when withPagination is true.");
+          }
+
+          response.links = buildPaginationLinks({
+            baseUrl: config.baseUrl,
+            page: searchQuery.page,
+            limit: searchQuery.limit,
+            totalRecords: total_records,
+            sortBy: searchQuery.sortBy,
+            sortOrder: searchQuery.sortOrder,
+            filters: parsedQuery,
+          });
+        }
+
+        return response;
       } catch (error) {
         if (error instanceof ZodError) {
           throw new ServiceError(

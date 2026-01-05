@@ -44,25 +44,25 @@ const PartnersPage = async (props: PartnersPageProps) => {
       : "asc"
     : "desc";
 
-  const { partners, meta } = await partnerService.findAll(
+  const { partners, meta, links } = await partnerService.findAll(
     { page, limit, sortBy, sortOrder },
-    session
+    session,
+    { withPagination: true, baseUrl: "/dashboard/partners" }
   );
-  const { current_page, total_pages, total_records } = meta;
+
+  const { current_page, total_records } = meta;
 
   return (
     <div className="bg-white rounded-lg shadow-md">
-      <div className="flex align-middle justify-between">
-        <header className="p-6 border-b border-gray-200">
+      <div className="flex align-middle p-6 justify-between border-b border-gray-200">
+        <header>
           <h1 className="text-3xl font-bold text-gray-800">Partners</h1>
         </header>
         <Link
           href="/dashboard/partners/create"
-          className="p-6 border-b border-gray-200"
+          className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium bg-blue-500 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-            Create Partner
-          </button>
+          Create Partner
         </Link>
       </div>
       <div className="p-6">
@@ -83,9 +83,9 @@ const PartnersPage = async (props: PartnersPageProps) => {
             {Math.min(current_page * limit, total_records)} of {total_records}
           </span>
           <PaginationControls
-            totalPages={total_pages}
-            currentPage={current_page}
             limit={limit}
+            prevPageUrl={links?.prev as string}
+            nextPageUrl={links?.next as string}
           />
         </footer>
       )}

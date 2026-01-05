@@ -40,6 +40,7 @@ export async function GET(request: Request) {
     const session = await getServerSession(authOptions);
 
     const url = new URL(request.url);
+    console.log("#debug :", { url });
     const { searchParams } = url;
     const query = Object.fromEntries(searchParams.entries());
 

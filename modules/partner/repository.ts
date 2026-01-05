@@ -29,9 +29,13 @@ export async function create(
       const details = error.errInfo?.details;
       const rules = details?.schemaRulesNotSatisfied ?? [];
 
-      const missing = rules.flatMap((rule: SchemaValidationRule) => rule.missingProperties ?? []);
+      const missing = rules.flatMap(
+        (rule: SchemaValidationRule) => rule.missingProperties ?? []
+      );
       const invalid = rules.flatMap((rule: SchemaValidationRule) =>
-        (rule.propertiesNotSatisfied ?? []).map((p: { propertyName: string }) => p.propertyName)
+        (rule.propertiesNotSatisfied ?? []).map(
+          (p: { propertyName: string }) => p.propertyName
+        )
       );
 
       console.error("Mongo validation failed", { missing, invalid, rules });
@@ -47,12 +51,7 @@ export async function findById(id: string): Promise<PartnerDocument | null> {
 
 export async function findAll(query: SearchQuery): Promise<{
   partners: PartnerDocument[];
-  meta: {
-    current_page: number;
-    items_per_page: number;
-    total_records: number;
-    total_pages: number;
-  };
+  total_records: number;
 }> {
   const { email, limit, page, partner_number, sortBy, sortOrder } = query;
 
@@ -77,12 +76,13 @@ export async function findAll(query: SearchQuery): Promise<{
 
   return {
     partners,
-    meta: {
-      current_page: page,
-      items_per_page: limit,
-      total_records: total,
-      total_pages: Math.ceil(total / limit),
-    },
+    // meta: {
+    //   current_page: page,
+    //   items_per_page: limit,
+    //   total_records: total,
+    //   total_pages: Math.ceil(total / limit),
+    // },
+    total_records: total,
   };
 }
 

@@ -1,75 +1,49 @@
-"use client";
-
-import type { ChangeEvent } from "react";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
+import PaginationLimitSelector from "./PaginationLimitSelector";
 
 interface PaginationControlsProps {
-  totalPages: number;
-  currentPage: number;
   limit: number;
+  prevPageUrl: string;
+  nextPageUrl: string;
 }
 
-const PAGE_SIZE_OPTIONS = [8, 20, 50, 100];
-
 const PaginationControls = ({
-  totalPages,
-  currentPage,
   limit,
+  prevPageUrl,
+  nextPageUrl,
 }: PaginationControlsProps) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const base =
+    "inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium";
+  const enabled =
+    "bg-blue-500 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2";
+  const disabledCls = "bg-blue-200 text-white/70 cursor-not-allowed";
 
-  const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", newPage.toString());
-    router.push(`${pathname}?${params.toString()}`);
-  };
+  const hasPrev = !!prevPageUrl;
+  const hasNext = !!nextPageUrl;
 
-  const handleLimitChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const newLimit = Number(event.target.value);
-    const params = new URLSearchParams(searchParams);
-    params.set("limit", newLimit.toString());
-    params.set("page", "1");
-    router.push(`${pathname}?${params.toString()}`);
-  };
+  const prevLink = hasPrev ? (
+    <Link href={prevPageUrl} className={`${base} ${enabled}`}>
+      Previous
+    </Link>
+  ) : (
+    <span className={`${base} ${disabledCls}`}>Previous</span>
+  );
+
+  const nextLink = hasNext ? (
+    <Link href={nextPageUrl} className={`${base} ${enabled}`}>
+      Next
+    </Link>
+  ) : (
+    <span className={`${base} ${disabledCls}`}>Next</span>
+  );
 
   return (
     <div className="flex items-center space-x-4">
       <div className="flex items-center space-x-2">
-        <label
-          htmlFor="pagination-limit"
-          className="text-sm font-medium text-gray-700"
-        >
-          Rows
-        </label>
-        <select
-          id="pagination-limit"
-          value={limit}
-          onChange={handleLimitChange}
-          className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-        >
-          {PAGE_SIZE_OPTIONS.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
+        <PaginationLimitSelector limit={limit}></PaginationLimitSelector>
       </div>
-      <button
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage <= 1}
-        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
-      >
-        Previous
-      </button>
-      <button
-        onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage >= totalPages}
-        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
-      >
-        Next
-      </button>
+      {prevLink}
+      {nextLink}
     </div>
   );
 };
