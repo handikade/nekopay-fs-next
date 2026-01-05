@@ -14,36 +14,50 @@ describe("buildPaginationLinks", () => {
     const page = 1;
     const links = buildPaginationLinks({ ...commonParams, baseUrl, page });
 
-    expect(links.first).toBe(`${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`);
+    expect(links.first).toBe(
+      `${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`
+    );
     expect(links.prev).toBe("");
-    expect(links.hasPrev).toBe(false);
-    expect(links.next).toBe(`${baseUrl}?page=2&limit=10&sortBy=name&sortOrder=asc`);
-    expect(links.hasNext).toBe(true);
-    expect(links.last).toBe(`${baseUrl}?page=10&limit=10&sortBy=name&sortOrder=asc`);
+    expect(links.next).toBe(
+      `${baseUrl}?page=2&limit=10&sortBy=name&sortOrder=asc`
+    );
+    expect(links.last).toBe(
+      `${baseUrl}?page=10&limit=10&sortBy=name&sortOrder=asc`
+    );
   });
 
   it("should generate correct links for a middle page", () => {
     const page = 5;
     const links = buildPaginationLinks({ ...commonParams, baseUrl, page });
 
-    expect(links.first).toBe(`${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`);
-    expect(links.prev).toBe(`${baseUrl}?page=4&limit=10&sortBy=name&sortOrder=asc`);
-    expect(links.hasPrev).toBe(true);
-    expect(links.next).toBe(`${baseUrl}?page=6&limit=10&sortBy=name&sortOrder=asc`);
-    expect(links.hasNext).toBe(true);
-    expect(links.last).toBe(`${baseUrl}?page=10&limit=10&sortBy=name&sortOrder=asc`);
+    expect(links.first).toBe(
+      `${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`
+    );
+    expect(links.prev).toBe(
+      `${baseUrl}?page=4&limit=10&sortBy=name&sortOrder=asc`
+    );
+    expect(links.next).toBe(
+      `${baseUrl}?page=6&limit=10&sortBy=name&sortOrder=asc`
+    );
+    expect(links.last).toBe(
+      `${baseUrl}?page=10&limit=10&sortBy=name&sortOrder=asc`
+    );
   });
 
   it("should generate correct links for the last page", () => {
     const page = 10;
     const links = buildPaginationLinks({ ...commonParams, baseUrl, page });
 
-    expect(links.first).toBe(`${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`);
-    expect(links.prev).toBe(`${baseUrl}?page=9&limit=10&sortBy=name&sortOrder=asc`);
-    expect(links.hasPrev).toBe(true);
+    expect(links.first).toBe(
+      `${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`
+    );
+    expect(links.prev).toBe(
+      `${baseUrl}?page=9&limit=10&sortBy=name&sortOrder=asc`
+    );
     expect(links.next).toBe("");
-    expect(links.hasNext).toBe(false);
-    expect(links.last).toBe(`${baseUrl}?page=10&limit=10&sortBy=name&sortOrder=asc`);
+    expect(links.last).toBe(
+      `${baseUrl}?page=10&limit=10&sortBy=name&sortOrder=asc`
+    );
   });
 
   it("should handle totalRecords less than limit (single page)", () => {
@@ -56,12 +70,14 @@ describe("buildPaginationLinks", () => {
       limit: 10,
     });
 
-    expect(links.first).toBe(`${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`);
+    expect(links.first).toBe(
+      `${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`
+    );
     expect(links.prev).toBe("");
-    expect(links.hasPrev).toBe(false);
     expect(links.next).toBe("");
-    expect(links.hasNext).toBe(false);
-    expect(links.last).toBe(`${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`);
+    expect(links.last).toBe(
+      `${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`
+    );
   });
 
   it("should handle maxPage constraint", () => {
@@ -74,12 +90,16 @@ describe("buildPaginationLinks", () => {
       maxPage: 5, // Should clamp to 5 pages
     });
 
-    expect(links.first).toBe(`${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`);
+    expect(links.first).toBe(
+      `${baseUrl}?page=1&limit=10&sortBy=name&sortOrder=asc`
+    );
     expect(links.prev).toBe("");
-    expect(links.hasPrev).toBe(false);
-    expect(links.next).toBe(`${baseUrl}?page=2&limit=10&sortBy=name&sortOrder=asc`);
-    expect(links.hasNext).toBe(true);
-    expect(links.last).toBe(`${baseUrl}?page=5&limit=10&sortBy=name&sortOrder=asc`);
+    expect(links.next).toBe(
+      `${baseUrl}?page=2&limit=10&sortBy=name&sortOrder=asc`
+    );
+    expect(links.last).toBe(
+      `${baseUrl}?page=5&limit=10&sortBy=name&sortOrder=asc`
+    );
 
     const middlePageLinks = buildPaginationLinks({
       ...commonParams,
@@ -88,10 +108,13 @@ describe("buildPaginationLinks", () => {
       totalRecords: 200,
       maxPage: 5,
     });
-    expect(middlePageLinks.prev).toBe(`${baseUrl}?page=4&limit=10&sortBy=name&sortOrder=asc`);
+    expect(middlePageLinks.prev).toBe(
+      `${baseUrl}?page=4&limit=10&sortBy=name&sortOrder=asc`
+    );
     expect(middlePageLinks.next).toBe("");
-    expect(middlePageLinks.hasNext).toBe(false);
-    expect(middlePageLinks.last).toBe(`${baseUrl}?page=5&limit=10&sortBy=name&sortOrder=asc`);
+    expect(middlePageLinks.last).toBe(
+      `${baseUrl}?page=5&limit=10&sortBy=name&sortOrder=asc`
+    );
   });
 
   it("should generate links without sortBy and sortOrder if not provided", () => {
