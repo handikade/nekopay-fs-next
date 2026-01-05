@@ -1,3 +1,4 @@
+import incrementDocNumber from "@/lib/increment-doc-number";
 import { buildPaginationLinks, PaginationLinks } from "@/lib/pagination";
 import { ServiceError } from "@/lib/service-error";
 import { type Session } from "next-auth";
@@ -22,6 +23,7 @@ type PartnerRepository = {
   findAll: typeof partnerRepository.findAll;
   findById: typeof partnerRepository.findById;
   deleteById: typeof partnerRepository.deleteById;
+  findLatestByUserId: typeof partnerRepository.findLatestByUserId;
 };
 
 /**
@@ -220,6 +222,18 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
       }
 
       return await repo.deleteById(id);
+    },
+
+    async generateNextPartnerNumber(session: Session | null) {
+      const userId = (session?.user as { id?: string })?.id;
+      if (!userId) {
+        throw new ServiceError(401, "You must be logged in.");
+      }
+
+      const latestPartner = await repo.findLatestByUserId(userId);
+      // Use 'PN' as the default prefix if no partners exist yet.
+      const lastNumber = latestPartner?.partner_number || "PN";
+      return incrementDocNumber(lastNumber);
     },
   };
 }

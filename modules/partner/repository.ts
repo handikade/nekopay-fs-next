@@ -96,3 +96,11 @@ export async function update(
 export async function deleteById(id: string): Promise<PartnerDocument | null> {
   return await PartnerModel.findByIdAndDelete(id).exec();
 }
+
+export async function findLatestByUserId(
+  userId: string
+): Promise<PartnerDocument | null> {
+  return await PartnerModel.findOne({ user_id: userId })
+    .sort({ created_at: -1 })
+    .exec();
+}
