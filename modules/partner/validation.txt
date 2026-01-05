@@ -16,19 +16,31 @@
         description: 'Reference to users._id'
       },
       type: {
-        bsonType: 'string',
-        'enum': [
-          'supplier',
-          'buyer',
-          'both'
-        ],
-        description: 'Partner type'
+        bsonType: 'array',
+        description: 'Partner types',
+        minItems: 1,
+        uniqueItems: true,
+        items: {
+          bsonType: 'string',
+          'enum': [
+            'supplier',
+            'buyer'
+          ],
+          description: 'Partner type'
+        }
       },
       partner_number: {
         bsonType: 'string'
       },
       business_entity: {
-        bsonType: 'string'
+        bsonType: 'string',
+        'enum': [
+          'cv',
+          'pt',
+          'koperasi',
+          'perorangan',
+          'lainnya'
+        ]
       },
       name: {
         bsonType: 'string'
@@ -43,26 +55,88 @@
       company_phone: {
         bsonType: 'string'
       },
-      address_line1: {
-        bsonType: 'string'
+      address_intl: {
+        bsonType: 'object',
+        properties: {
+          street: {
+            bsonType: 'string'
+          },
+          city: {
+            bsonType: 'string'
+          },
+          state: {
+            bsonType: 'string'
+          }
+        }
       },
-      address_line2: {
-        bsonType: 'string'
-      },
-      regency: {
-        bsonType: 'string'
-      },
-      city: {
-        bsonType: 'string'
-      },
-      province: {
-        bsonType: 'string'
-      },
-      postal_code: {
-        bsonType: 'string'
+      address: {
+        bsonType: 'object',
+        properties: {
+          address_line1: {
+            bsonType: 'string'
+          },
+          address_line2: {
+            bsonType: 'string'
+          },
+          kelurahan: {
+            bsonType: 'object',
+            properties: {
+              id: {
+                bsonType: 'string'
+              },
+              name: {
+                bsonType: 'string'
+              }
+            }
+          },
+          kecamatan: {
+            bsonType: 'object',
+            properties: {
+              id: {
+                bsonType: 'string'
+              },
+              name: {
+                bsonType: 'string'
+              }
+            }
+          },
+          kabupaten: {
+            bsonType: 'object',
+            properties: {
+              id: {
+                bsonType: 'string'
+              },
+              name: {
+                bsonType: 'string'
+              }
+            }
+          },
+          provinsi: {
+            bsonType: 'object',
+            properties: {
+              id: {
+                bsonType: 'string'
+              },
+              name: {
+                bsonType: 'string'
+              }
+            }
+          },
+          postal_code: {
+            bsonType: 'string'
+          }
+        }
       },
       country: {
-        bsonType: 'string'
+        bsonType: 'object',
+        properties: {
+          iso2: {
+            bsonType: 'string'
+          },
+          name: {
+            bsonType: 'string'
+          }
+        }
       },
       created_by: {
         bsonType: 'string'
