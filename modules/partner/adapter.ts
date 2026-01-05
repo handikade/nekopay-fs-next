@@ -1,6 +1,11 @@
-import type { FindPartnersQueryDto, ListPartnerDto } from "./dto";
+import { Types } from "mongoose";
+import type {
+  CreatePartnerDto,
+  FindPartnersQueryDto,
+  ListPartnerDto,
+} from "./dto";
 import { SearchQuery } from "./repository";
-import type { PartnerDocument } from "./schema";
+import type { Partner, PartnerDocument } from "./schema";
 
 export function partnerToListDto(partner: PartnerDocument): ListPartnerDto {
   return {
@@ -10,7 +15,7 @@ export function partnerToListDto(partner: PartnerDocument): ListPartnerDto {
     name: partner.name,
     email: partner.email,
     phone: partner.phone,
-    createdAt: new Date(partner.created_at).toLocaleDateString(),
+    created_at: new Date(partner.created_at).toLocaleDateString(),
   };
 }
 
@@ -25,4 +30,26 @@ export function adaptFindPartnersQueryDtoToSearchQuery(
     ...(query.email && { email: query.email }),
     ...(query.partner_number && { partner_number: query.partner_number }),
   };
+}
+
+export function adaptCreatePartnerDtoToPartner(dto: CreatePartnerDto): Partner {
+  const partner: Partner = {
+    // basic
+    partner_number: dto.partner_number,
+    email: dto.email,
+    name: dto.name,
+    phone: dto.phone,
+    type: dto.type,
+    business_entity: dto.business_entity,
+    company_phone: dto.company_phone,
+    // address
+    address: dto.address,
+    // others
+    user_id: new Types.ObjectId(dto.user_id),
+    created_by: dto.created_by,
+    created_at: dto.created_at,
+    updated_at: dto.updated_at,
+  };
+
+  return partner;
 }

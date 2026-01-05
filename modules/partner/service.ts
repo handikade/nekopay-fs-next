@@ -3,6 +3,7 @@ import { ServiceError } from "@/lib/service-error";
 import { type Session } from "next-auth";
 import { z, ZodError } from "zod";
 import {
+  adaptCreatePartnerDtoToPartner,
   adaptFindPartnersQueryDtoToSearchQuery,
   partnerToListDto,
 } from "./adapter";
@@ -39,7 +40,6 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
      * @throws {ServiceError} If the user is not authenticated or if the payload fails validation.
      */
     async create(payload: unknown, session: Session | null) {
-      // 1. Get user from session and ensure user is authenticated
       const userId = (session?.user as { id?: string })?.id;
       const userEmail = session?.user?.email;
 
@@ -51,23 +51,21 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
       }
 
       try {
-        // 2. Validate the incoming payload against the DTO, but exclude fields
-        //    that the service is responsible for setting.
         const inputSchema = createPartnerDto.omit({
           user_id: true,
           created_by: true,
         });
         const parsedPayload = inputSchema.parse(payload);
 
-        // 3. Combine the validated payload with the data from the session
         const completePayload: CreatePartnerDto = {
           ...parsedPayload,
           user_id: userId,
           created_by: userEmail,
         };
 
-        // 4. Pass the complete, validated DTO to the injected repository
-        const newPartner = await repo.create(completePayload);
+        const newPartner = await repo.create(
+          adaptCreatePartnerDtoToPartner(completePayload)
+        );
 
         return newPartner;
       } catch (error) {

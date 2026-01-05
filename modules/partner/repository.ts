@@ -1,8 +1,9 @@
 import { MongoServerError } from "mongodb";
-import type { QueryFilter, SortOrder } from "mongoose";
-import type { CreatePartnerDto, UpdatePartnerDto } from "./dto";
 import { PartnerModel } from "./model";
-import type { PartnerDocument } from "./schema";
+
+import type { QueryFilter, SortOrder } from "mongoose";
+import type { UpdatePartnerDto } from "./dto";
+import type { Partner, PartnerDocument } from "./schema";
 
 interface SchemaValidationRule {
   missingProperties?: string[];
@@ -18,10 +19,7 @@ export type SearchQuery = {
   partner_number?: string;
 };
 
-export async function create(
-  payload: CreatePartnerDto
-): Promise<PartnerDocument> {
-  console.log(payload);
+export async function create(payload: Partner): Promise<PartnerDocument> {
   try {
     return await PartnerModel.create(payload);
   } catch (error) {

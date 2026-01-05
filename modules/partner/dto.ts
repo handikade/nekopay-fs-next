@@ -1,22 +1,50 @@
 import { z } from "zod";
 
+const locationObject = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
+const addressIntlObject = z.object({
+  street: z.string(),
+  city: z.string(),
+  state: z.string(),
+});
+
+const countryObject = z.object({
+  iso2: z.string(),
+  name: z.string(),
+});
+
 const partnerInputSchema = z.object({
   user_id: z.string(),
-  type: z.enum(["supplier", "buyer", "both"]),
+  type: z.array(z.enum(["supplier", "buyer"])).min(1, {
+    message: "Partner type must have at least one item.",
+  }),
   partner_number: z.string().trim(),
-  business_entity: z.string().trim().optional(),
+  business_entity: z
+    .enum(["cv", "pt", "koperasi", "perorangan", "lainnya"])
+    .optional(),
   name: z.string().trim(),
   email: z.email(),
   phone: z.string().trim(),
   company_phone: z.string().trim().optional(),
-  address_line1: z.string().trim().optional(),
-  address_line2: z.string().trim().optional(),
-  regency: z.string().trim().optional(),
-  city: z.string().trim().optional(),
-  province: z.string().trim().optional(),
-  postal_code: z.string().trim().optional(),
-  country: z.string().trim().optional(),
+  address: z
+    .object({
+      address_line1: z.string().trim().optional(),
+      address_line2: z.string().trim().optional(),
+      kelurahan: locationObject.optional(),
+      kecamatan: locationObject.optional(),
+      kabupaten: locationObject.optional(),
+      provinsi: locationObject.optional(),
+      postal_code: z.string().trim().optional(),
+    })
+    .optional(),
+  address_intl: addressIntlObject.optional(),
+  country: countryObject.optional(),
   created_by: z.string().trim(),
+  created_at: z.date().optional().default(new Date()),
+  updated_at: z.date().optional(),
 });
 
 export const createPartnerDto = partnerInputSchema;
@@ -30,30 +58,38 @@ export const updatePartnerDto = partnerInputSchema
   });
 export type UpdatePartnerDto = z.infer<typeof updatePartnerDto>;
 
-// Base schema for partner data returned from API@dto
+// Base schema for partner data returned from API
 const partnerBase = z.object({
   id: z.string(),
-  type: z.enum(["supplier", "buyer", "both"]),
+  type: z.array(z.enum(["supplier", "buyer"])),
   number: z.string(),
   name: z.string(),
   email: z.email(),
   phone: z.string(),
-  createdAt: z.string(),
+  created_at: z.string(),
 });
 
 export const listPartnerDto = partnerBase;
 export type ListPartnerDto = z.infer<typeof listPartnerDto>;
 
 export const detailPartnerDto = partnerBase.extend({
-  business_entity: z.string().optional(),
+  business_entity: z
+    .enum(["cv", "pt", "koperasi", "perorangan", "lainnya"])
+    .optional(),
   company_phone: z.string().optional(),
-  address_line1: z.string().optional(),
-  address_line2: z.string().optional(),
-  regency: z.string().optional(),
-  city: z.string().optional(),
-  province: z.string().optional(),
-  postal_code: z.string().optional(),
-  country: z.string().optional(),
+  address: z
+    .object({
+      address_line1: z.string().optional(),
+      address_line2: z.string().optional(),
+      kelurahan: locationObject.optional(),
+      kecamatan: locationObject.optional(),
+      kabupaten: locationObject.optional(),
+      provinsi: locationObject.optional(),
+      postal_code: z.string().optional(),
+    })
+    .optional(),
+  address_intl: addressIntlObject.optional(),
+  country: countryObject.optional(),
   created_by: z.string(),
   created_at: z.date(),
   updated_at: z.date().optional(),
