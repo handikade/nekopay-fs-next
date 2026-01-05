@@ -7,59 +7,76 @@ import {
 } from "@heroicons/react/24/outline";
 import { signOut } from "next-auth/react";
 
+import { Button } from "@/components/ui/button";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarSeparator,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+
+const navItems = [
+  { title: "Home", href: "/dashboard", icon: HomeIcon },
+  { title: "Partners", href: "/dashboard/partners", icon: UsersIcon },
+  { title: "Settings", href: "#", icon: Cog6ToothIcon },
+];
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-gray-800 text-white flex flex-col">
-        <div className="p-4 text-2xl font-bold border-b border-gray-700">
-          Dashboard
-        </div>
-        <nav className="flex-1 p-4 space-y-2">
-          <a
-            href="/dashboard"
-            className="flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-700"
-          >
-            <HomeIcon className="h-5 w-5" />
-            <span>Home</span>
-          </a>
-          <a
-            href="/dashboard/partners"
-            className="flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-700"
-          >
-            <UsersIcon className="h-5 w-5" />
-            <span>Partners</span>
-          </a>
-          <a
-            href="#"
-            className="flex items-center space-x-2 py-2 px-4 rounded hover:bg-gray-700"
-          >
-            <Cog6ToothIcon className="h-5 w-5" />
-            <span>Settings</span>
-          </a>
-        </nav>
-      </aside>
+    <SidebarProvider>
+      <Sidebar>
+        <SidebarHeader>
+          <div className="flex items-center gap-2 px-2 py-1.5 text-lg font-semibold">
+            Dashboard
+          </div>
+        </SidebarHeader>
+        <SidebarSeparator />
+        <SidebarContent>
+          <SidebarMenu>
+            {navItems.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild tooltip={item.title}>
+                  <a href={item.href} className="flex items-center gap-2">
+                    <item.icon className="size-4" />
+                    <span>{item.title}</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Toolbar */}
-        <header className="flex items-center justify-between p-4 bg-white border-b border-gray-200 shadow-sm">
-          <h1 className="text-2xl font-semibold">Welcome to Dashboard</h1>
-          <button
+      <SidebarInset>
+        <header className="flex items-center justify-between gap-3 border-b bg-background px-4 py-3">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="-ml-1" />
+            <h1 className="text-lg font-semibold sm:text-xl">
+              Welcome to Dashboard
+            </h1>
+          </div>
+          <Button
+            variant="destructive"
+            size="sm"
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
           >
             Sign Out
-          </button>
+          </Button>
         </header>
-
-        {/* Content Area */}
-        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
-      </div>
-    </div>
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
