@@ -1,4 +1,9 @@
 import incrementDocNumber from "@/lib/increment-doc-number";
+import {
+  isZodError,
+  NekoApiError,
+  zodErrorToNekoApiError,
+} from "@/lib/neko-api-error";
 import { buildPaginationLinks, PaginationLinks } from "@/lib/pagination";
 import { ServiceError } from "@/lib/service-error";
 import { type Session } from "next-auth";
@@ -39,14 +44,14 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
      * @param payload - The raw partner data from the client. Should not include `user_id` or `created_by`.
      * @param session - The user session object.
      * @returns The newly created partner document.
-     * @throws {ServiceError} If the user is not authenticated or if the payload fails validation.
+     * @throws {NekoApiError} If the user is not authenticated or if the payload fails validation.
      */
     async create(payload: unknown, session: Session | null) {
       const userId = (session?.user as { id?: string })?.id;
       const userEmail = session?.user?.email;
 
       if (!userId || !userEmail) {
-        throw new ServiceError(
+        throw new NekoApiError(
           401,
           "You must be logged in to create a partner."
         );
@@ -71,13 +76,8 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
 
         return newPartner;
       } catch (error) {
-        if (error instanceof ZodError) {
-          // Re-throw Zod validation errors as a structured ServiceError
-          throw new ServiceError(
-            400,
-            "Invalid input data",
-            z.treeifyError(error)
-          );
+        if (isZodError(error)) {
+          throw zodErrorToNekoApiError(error);
         }
         // Re-throw other errors
         throw error;
@@ -146,7 +146,10 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
 
       try {
         const parsedQuery = findPartnersQueryDto.parse(query);
-        const searchQuery = adaptFindPartnersQueryDtoToSearchQuery(parsedQuery, userId);
+        const searchQuery = adaptFindPartnersQueryDtoToSearchQuery(
+          parsedQuery,
+          userId
+        );
         const { partners, total_records } = await repo.findAll(searchQuery);
         const meta = {
           total_records,

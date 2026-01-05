@@ -21,7 +21,7 @@ const partnerInputSchema = z.object({
   type: z.array(z.enum(["supplier", "buyer"])).min(1, {
     message: "Partner type must have at least one item.",
   }),
-  partner_number: z.string().trim(),
+  partner_number: z.string().trim().nonempty(),
   business_entity: z
     .enum(["cv", "pt", "koperasi", "perorangan", "lainnya"])
     .optional(),

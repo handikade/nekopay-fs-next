@@ -1,5 +1,6 @@
 import { successResponse } from "@/lib/api-response";
 import { connectMongo } from "@/lib/mongoose";
+import { isNekoApiError } from "@/lib/neko-api-error";
 import { ServiceError } from "@/lib/service-error";
 import partnerService from "@/modules/partner/service";
 import { getServerSession } from "next-auth";
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
     const newPartner = await partnerService.create(payload, session);
     return NextResponse.json(newPartner, { status: 201 });
   } catch (error) {
-    if (error instanceof ServiceError) {
+    if (isNekoApiError(error)) {
       return NextResponse.json(
         {
           message: error.message,
