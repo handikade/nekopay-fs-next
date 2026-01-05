@@ -138,13 +138,15 @@ export function PartnerServiceFactory(repo: PartnerRepository) {
         withPagination: false,
       }
     ) {
-      if (!session?.user) {
+      const userId = (session?.user as { id?: string })?.id;
+
+      if (!userId) {
         throw new ServiceError(401, "You must be logged in to view partners.");
       }
 
       try {
         const parsedQuery = findPartnersQueryDto.parse(query);
-        const searchQuery = adaptFindPartnersQueryDtoToSearchQuery(parsedQuery);
+        const searchQuery = adaptFindPartnersQueryDtoToSearchQuery(parsedQuery, userId);
         const { partners, total_records } = await repo.findAll(searchQuery);
         const meta = {
           total_records,

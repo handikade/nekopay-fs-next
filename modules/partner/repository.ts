@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { MongoServerError } from "mongodb";
 import { PartnerModel } from "./model";
 
@@ -11,6 +12,7 @@ interface SchemaValidationRule {
 }
 
 export type SearchQuery = {
+  userId: string;
   page: number;
   limit: number;
   sortBy: string;
@@ -51,9 +53,11 @@ export async function findAll(query: SearchQuery): Promise<{
   partners: PartnerDocument[];
   total_records: number;
 }> {
-  const { email, limit, page, partner_number, sortBy, sortOrder } = query;
+  const { userId, email, limit, page, partner_number, sortBy, sortOrder } = query;
 
-  const filters: QueryFilter<PartnerDocument> = {};
+  const filters: QueryFilter<PartnerDocument> = {
+    user_id: new Types.ObjectId(userId)
+  };
 
   if (email) filters.email = { $regex: email, $options: "i" };
   if (partner_number)

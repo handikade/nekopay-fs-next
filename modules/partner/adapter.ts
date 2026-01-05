@@ -20,9 +20,11 @@ export function partnerToListDto(partner: PartnerDocument): ListPartnerDto {
 }
 
 export function adaptFindPartnersQueryDtoToSearchQuery(
-  query: FindPartnersQueryDto
+  query: FindPartnersQueryDto,
+  userId: string
 ): SearchQuery {
   return {
+    userId: userId,
     page: query.page ?? 1,
     limit: query.limit ?? 10,
     sortBy: query.sortBy ?? "created_at",
