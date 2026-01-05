@@ -1,6 +1,16 @@
 "use client";
 
-import NekoButton from "@/components/NekoButton";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { createPartnerDto } from "@/modules/partner/dto";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -42,61 +52,51 @@ const PartnerForm = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit, onError)}
-      className="space-y-4 p-6 bg-white shadow rounded-lg "
-    >
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label
-            htmlFor="partner_number"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Partner Number
-          </label>
-          <input
-            id="partner_number"
-            {...register("partner_number")}
-            placeholder="Partner Number"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm placeholder:text-gray-500 placeholder:italic text-blue-950"
-          />
-        </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Create a Partner</CardTitle>
+        <CardDescription>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit, onError)}>
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-2">
+              <Label htmlFor="partner_number">Partner Number</Label>
+              <Input
+                id="partner_number"
+                {...register("partner_number")}
+                placeholder="e.g. PN001"
+              />
+            </div>
 
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Email
-          </label>
-          <input
-            id="email"
-            {...register("email")}
-            placeholder="Email"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm placeholder:text-gray-500 placeholder:italic text-blue-950"
-          />
-        </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                {...register("email")}
+                placeholder="e.g dika@nekopay.id"
+              />
+            </div>
 
-        <div>
-          <label
-            htmlFor="phone"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Phone
-          </label>
-          <input
-            id="phone"
-            {...register("phone")}
-            placeholder="Phone"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm placeholder:text-gray-500 placeholder:italic text-blue-950"
-          />
-        </div>
-      </div>
-
-      <div className="flex items-center justify-end">
-        <NekoButton type="submit" child="Nyan!"></NekoButton>
-      </div>
-    </form>
+            <div className="grid gap-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                {...register("phone")}
+                placeholder="e.g. 08123456789"
+              />
+            </div>
+          </div>
+        </form>
+      </CardContent>
+      <CardFooter>
+        <Button type="submit" className="w-full">
+          Save
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 
