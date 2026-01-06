@@ -22,14 +22,7 @@ import {
 import * as partnerRepository from "./repository";
 
 // Define the shape of the repository dependency for the factory
-type PartnerRepository = {
-  create: typeof partnerRepository.create;
-  update: typeof partnerRepository.update;
-  findAll: typeof partnerRepository.findAll;
-  findById: typeof partnerRepository.findById;
-  deleteById: typeof partnerRepository.deleteById;
-  findLatestByUserId: typeof partnerRepository.findLatestByUserId;
-};
+type PartnerRepository = typeof import("./repository");
 
 /**
  * Factory function to create a partner service.

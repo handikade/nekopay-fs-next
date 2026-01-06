@@ -1,5 +1,5 @@
-import { Types } from "mongoose";
 import { MongoServerError } from "mongodb";
+import { Types } from "mongoose";
 import { PartnerModel } from "./model";
 
 import type { QueryFilter, SortOrder } from "mongoose";
@@ -53,10 +53,11 @@ export async function findAll(query: SearchQuery): Promise<{
   partners: PartnerDocument[];
   total_records: number;
 }> {
-  const { userId, email, limit, page, partner_number, sortBy, sortOrder } = query;
+  const { userId, email, limit, page, partner_number, sortBy, sortOrder } =
+    query;
 
   const filters: QueryFilter<PartnerDocument> = {
-    user_id: new Types.ObjectId(userId)
+    user_id: new Types.ObjectId(userId),
   };
 
   if (email) filters.email = { $regex: email, $options: "i" };
@@ -107,4 +108,11 @@ export async function findLatestByUserId(
   return await PartnerModel.findOne({ user_id: userId })
     .sort({ created_at: -1 })
     .exec();
+}
+
+export async function findByIdAndUserId(
+  id: string,
+  userId: string
+): Promise<PartnerDocument | null> {
+  return await PartnerModel.findOne({ _id: id, user_id: userId }).exec();
 }
