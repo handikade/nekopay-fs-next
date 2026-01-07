@@ -1,3 +1,4 @@
+import { connectMongo } from "@/lib/mongoose";
 import {
   nekoErrorResponse,
   nekoSuccessResponse,
@@ -7,6 +8,8 @@ import bankService from "@/modules/bank/service";
 
 export async function GET(request: Request) {
   try {
+    await connectMongo();
+
     const { searchParams } = new URL(request.url);
     const query = Object.fromEntries(searchParams.entries());
 
