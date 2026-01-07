@@ -36,3 +36,23 @@ export async function findById(id: string) {
     throw new NekoApiError(500, "An unexpected error occurred");
   }
 }
+
+export async function findAll() {
+  try {
+    const partnerContacts = await PartnerContactModel.find({}).exec();
+    return partnerContacts;
+  } catch (error) {
+    console.log("Unexpected error", error);
+    throw new NekoApiError(500, "An unexpected error occurred");
+  }
+}
+
+export async function remove(id: string) {
+  try {
+    const partnerContact = await PartnerContactModel.findByIdAndDelete(id);
+    return partnerContact;
+  } catch (error) {
+    console.log("Unexpected error", error);
+    throw new NekoApiError(500, "An unexpected error occurred");
+  }
+}

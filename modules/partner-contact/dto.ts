@@ -10,16 +10,29 @@ const basePartnerContactSchema = z
       message: "Invalid Partner ID",
     }),
     name: z.string().min(1, "Name is required"),
-    email: z.email("Invalid email address").optional().or(z.literal("")),
+    email: z.email("Invalid email address").optional(),
     phone: z
       .string()
-      .min(1, "Phone number cannot be empty")
+      .trim()
+      .transform((v) => (v === "" ? undefined : v))
       .optional()
-      .or(z.literal("")),
+      .refine(
+        (v) => v === undefined || /^[+0-9()\-\s]{7,20}$/.test(v),
+        "Invalid phone number"
+      ),
+    // created_at: z.date(),
+    // updated_at: z.date(),
   })
   .refine((data) => data.email || data.phone, {
     message: "Either email or phone must be provided",
   });
+
+// Define a schema for the _id field
+const idSchema = z.object({
+  _id: z
+    .string()
+    .refine((val) => isValidObjectId(val), { message: "Invalid ID" }),
+});
 
 export const createPartnerContactDto = basePartnerContactSchema.strict();
 export type CreatePartnerContactDto = z.infer<typeof createPartnerContactDto>;
@@ -35,3 +48,17 @@ export const updatePartnerContactDto = basePartnerContactSchema
   })
   .strict();
 export type UpdatePartnerContactDto = z.infer<typeof updatePartnerContactDto>;
+
+export const listPartnerContactDto = basePartnerContactSchema
+  .omit({ user_id: true, partner_id: true })
+  .extend(idSchema.shape)
+  .extend({ created_at: z.string(), updated_at: z.string() })
+  .strict();
+export type ListPartnerContactDto = z.infer<typeof listPartnerContactDto>;
+
+export const viewPartnerContactDto = basePartnerContactSchema
+  .omit({ user_id: true, partner_id: true })
+  .extend(idSchema.shape)
+  .extend({ created_at: z.string(), updated_at: z.string() })
+  .strict();
+export type ViewPartnerContactDto = z.infer<typeof viewPartnerContactDto>;

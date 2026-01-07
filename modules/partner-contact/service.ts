@@ -4,9 +4,14 @@ import {
   zodErrorToNekoApiError,
 } from "@/lib/neko-api-error";
 import * as partnerRepository from "../partner/repository";
-import { createPartnerContactDtoToPartnerContact } from "./adapter";
+import {
+  CreatePartnerContactDto_to_PartnerContact,
+  PartnerContactDocument_to_ListPartnerContactDto,
+} from "./adapter";
 import { createPartnerContactDto, updatePartnerContactDto } from "./dto";
 import * as partnerContactRepository from "./repository";
+
+import type { PartnerContact } from "./schema";
 
 type PartnerContactRepository = typeof import("./repository");
 type PartnerRepository = typeof import("../partner/repository");
@@ -29,17 +34,10 @@ export function PartnerContactServiceFactory(
         }
 
         const pc = await partnerContactRepository.create(
-          createPartnerContactDtoToPartnerContact(parsedPayload)
+          CreatePartnerContactDto_to_PartnerContact(parsedPayload)
         );
 
-        const { _id, name, email, phone } = pc;
-
-        return {
-          id: _id.toString(),
-          name,
-          email,
-          phone,
-        };
+        return pc.toJSON();
       } catch (error) {
         if (isZodError(error)) {
           throw zodErrorToNekoApiError(error);
@@ -49,25 +47,17 @@ export function PartnerContactServiceFactory(
     },
 
     async update({
-      partnerContactId,
       userId,
-      payload,
+      partnerId,
+      contactId,
+      contactData,
     }: {
-      partnerContactId: string;
       userId: string;
-      payload: unknown;
+      partnerId: string;
+      contactId: string;
+      contactData: unknown;
     }) {
       try {
-        const partnerContact = await partnerContactRepository.findById(
-          partnerContactId
-        );
-
-        if (!partnerContact) {
-          throw new NekoApiError(404, "Partner contact not found.");
-        }
-
-        const partnerId = partnerContact.partner_id.toString();
-
         const partner = await partnerRepository.findByIdAndUserId(
           partnerId,
           userId
@@ -77,10 +67,12 @@ export function PartnerContactServiceFactory(
           throw new NekoApiError(404, "Partner not found.");
         }
 
-        const parsedPayload = updatePartnerContactDto.parse(payload);
+        const parsedPayload = updatePartnerContactDto.parse(
+          contactData
+        ) as PartnerContact;
 
         const updatedPartnerContact = await partnerContactRepository.update(
-          partnerContactId,
+          contactId,
           parsedPayload
         );
 
@@ -88,14 +80,101 @@ export function PartnerContactServiceFactory(
           throw new NekoApiError(404, "Partner contact not found.");
         }
 
-        const { _id, name, email, phone } = updatedPartnerContact;
+        return updatedPartnerContact.toJSON();
+      } catch (error) {
+        if (isZodError(error)) {
+          throw zodErrorToNekoApiError(error);
+        }
+        throw error;
+      }
+    },
 
-        return {
-          id: _id.toString(),
-          name,
-          email,
-          phone,
-        };
+    async findAll({
+      userId,
+      partnerId,
+    }: {
+      userId: string;
+      partnerId: string;
+    }) {
+      const partner = await partnerRepository.findByIdAndUserId(
+        partnerId,
+        userId
+      );
+
+      if (!partner) {
+        throw new NekoApiError(404, "Partner not found.");
+      }
+
+      const all = await partnerContactRepository.findAll();
+      const pcs = all.map(PartnerContactDocument_to_ListPartnerContactDto);
+
+      return pcs;
+    },
+
+    async remove({
+      userId,
+      partnerId,
+      contactId,
+    }: {
+      userId: string;
+      partnerId: string;
+      contactId: string;
+    }) {
+      try {
+        const partner = await partnerRepository.findByIdAndUserId(
+          partnerId,
+          userId
+        );
+
+        if (!partner) {
+          throw new NekoApiError(404, "Partner not found.");
+        }
+
+        const deletedContact = await partnerContactRepository.remove(contactId);
+
+        if (!deletedContact) {
+          throw new NekoApiError(404, "Partner contact not found.");
+        }
+
+        return { message: "Partner contact deleted successfully." };
+      } catch (error) {
+        if (isZodError(error)) {
+          throw zodErrorToNekoApiError(error);
+        }
+        throw error;
+      }
+    },
+
+    async findOne({
+      userId,
+      partnerId,
+      contactId,
+    }: {
+      userId: string;
+      partnerId: string;
+      contactId: string;
+    }) {
+      try {
+        const partner = await partnerRepository.findByIdAndUserId(
+          partnerId,
+          userId
+        );
+
+        if (!partner) {
+          throw new NekoApiError(404, "Partner not found.");
+        }
+
+        const contact = await partnerContactRepository.findById(contactId);
+
+        if (!contact) {
+          throw new NekoApiError(404, "Partner contact not found.");
+        }
+
+        if (contact.partner_id.toString() !== partnerId) {
+          throw new NekoApiError(403, "Forbidden: Contact does not belong to this partner.");
+        }
+
+        return contact.toJSON();
       } catch (error) {
         if (isZodError(error)) {
           throw zodErrorToNekoApiError(error);

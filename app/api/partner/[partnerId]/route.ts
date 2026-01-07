@@ -7,14 +7,14 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 
 export async function GET(
   _: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ partnerId: string }> }
 ) {
   await connectMongo();
 
   try {
     const session = await getServerSession(authOptions);
-    const { id } = await params;
-    const partner = await partnerService.findById(id, session);
+    const { partnerId } = await params;
+    const partner = await partnerService.findById(partnerId, session);
     return successResponse(partner);
   } catch (error) {
     if (error instanceof ServiceError) {
