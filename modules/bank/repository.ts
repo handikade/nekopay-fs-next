@@ -23,3 +23,7 @@ export async function findAll(query: SearchQuery): Promise<BankDocument[]> {
 
   return banks;
 }
+
+export async function findById(id: string): Promise<BankDocument | null> {
+  return await BankModel.findById(id).exec();
+}
